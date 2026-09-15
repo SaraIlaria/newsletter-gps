@@ -295,7 +295,7 @@ main{overflow-x:clip} /* le forme 3D a cavallo dei bordi non fanno scorrere la p
 .formula-griglia{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center;position:relative;z-index:1}
 .formula h2{font-size:clamp(28px,3.4vw,42px);line-height:1.12;margin:0 0 16px}
 .formula .attacco{font-size:19px}
-.piuuno{position:relative;margin:0}
+.piuuno{position:relative;margin:0;background:var(--fondo)} /* il fondo dietro al video, che ci si moltiplica sopra */
 .robot-video{display:block;width:min(100%,360px);height:auto;margin:0 auto;mix-blend-mode:multiply} /* fondo bianco nel video x colore della sezione = nessun riquadro su nessuno schermo */ /* il video del robot col 1+1 (Video Project 4, fondo tolto) */
 @media (min-width:861px){.formula .piuuno{left:calc((max(0px, (100vw - 1160px) / 2) + 28px) / 4)}} /* «avvicina verso sinistra leggermente» (15/09): da meta' a un quarto dello spazio libero */
 /* il 1+1 a pezzi: il primo 1 scende dalla mano sinistra, poi il secondo 1 dalla destra e il + in mezzo */
