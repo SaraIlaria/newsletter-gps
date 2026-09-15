@@ -245,11 +245,14 @@ main{overflow-x:clip} /* le forme 3D a cavallo dei bordi non fanno scorrere la p
 .moto .scaletta li.passata{opacity:.72}
 .moto .scaletta li.adesso{opacity:1;background:var(--grigio);border-left-color:var(--indaco);box-shadow:0 14px 28px rgba(39,37,37,.08);transform:translateX(8px)}
 @media (min-width:861px) and (min-height:600px){
-  .moto .programma{height:240vh;padding:0}
-  .moto .programma-fisso{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
-  .moto .programma-fisso>.fascia{width:100%;max-width:min(1400px,calc(150vh + 48px))}
-  .moto .quadrante-box{max-width:min(600px,58vh)}
+  .moto:not(.incorporata) .programma{height:240vh;padding:0}
+  .moto:not(.incorporata) .programma-fisso{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+  .moto:not(.incorporata) .programma-fisso>.fascia{width:100%;max-width:min(1400px,calc(150vh + 48px))}
+  .moto:not(.incorporata) .quadrante-box{max-width:min(600px,58vh)}
 }
+/* dentro Wix (iframe ad altezza fissa): niente barra di avanzamento né scorrimento morbido interno */
+html.incorporata{scroll-behavior:auto}
+.incorporata .avanzamento{display:none!important}
 
 /* 7 · chi parla: la foto in prospettiva con la cornice arancio, che si allarga entrando (bbang) */
 .relatori-griglia{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center;position:relative;z-index:1}
@@ -710,6 +713,21 @@ main{overflow-x:clip} /* le forme 3D a cavallo dei bordi non fanno scorrere la p
 (function () {
   var DATI = { indirizzo: 'https://aiperitivo.ai/san-benedetto-0210-aiperitivo' };
   var radice = document.documentElement;
+  // dentro un iframe (Wix) o con ?incorporata=1: la pagina non scorre da sé, scorre quella di Wix
+  var incorporata = false;
+  try { incorporata = window.self !== window.top; } catch (e) { incorporata = true; }
+  if (/[?&]incorporata=1/.test(location.search)) incorporata = true;
+  if (incorporata) {
+    radice.classList.add('incorporata');
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+      if (!a) return;
+      var id = a.getAttribute('href').slice(1), el = id && document.getElementById(id);
+      if (!el) return;
+      e.preventDefault();
+      try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (x) { el.scrollIntoView(); }
+    });
+  }
   var fermo = !window.matchMedia || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window);
   var frena = function (p) { return 1 - Math.pow(1 - p, 3); };
   function taglia(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
@@ -804,7 +822,8 @@ main{overflow-x:clip} /* le forme 3D a cavallo dei bordi non fanno scorrere la p
     }, { rootMargin: '0px 0px -15% 0px', threshold: 0 });
     ogni(elementi, function (el) { io.observe(el); });
 
-    var grande = window.matchMedia('(min-width:861px) and (min-height:600px)');
+    var grandeMq = window.matchMedia('(min-width:861px) and (min-height:600px)');
+    var grande = { get matches() { return !incorporata && grandeMq.matches; } }; // dentro Wix il quadrante gira da solo
     var sezProg = document.getElementById('programma'), giaGirato = false;
     segnaOra(0);
     new IntersectionObserver(function (v) {
